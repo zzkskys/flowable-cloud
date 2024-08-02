@@ -1,6 +1,18 @@
 spring:
+
   application:
     name: flowable-cloud
+
+  datasource:
+    username: root
+    password: qunchuang@123
+    url: jdbc:mysql://localhost:3306/flowable?useSSL=false&characterEncoding=utf-8&serverTimezone=GMT%2b8&nullCatalogMeansCurrent=true
+
+  rabbitmq:
+    virtual-host: zzk-demo
+    username: zzk
+    password: zzk
+    host: 192.168.1.226
 
 flowable:
   jpa-enabled: false
