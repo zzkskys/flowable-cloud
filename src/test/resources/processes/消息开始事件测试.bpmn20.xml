@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="message_start_demo" name="消息开始事件测试" isExecutable="true" flowable:candidateStarterGroups="" flowable:candidateStarterUsers="">
+    <bpmn:extensionElements>
+      <flowable:idmCandidateUsers>[]</flowable:idmCandidateUsers>
+      <flowable:idmCandidateGroups>[]</flowable:idmCandidateGroups>
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="start" name="消息开始">
+      <bpmn:outgoing>Flow_12b40yg</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0yqjjnm" messageRef="Message_Start" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="pushMessage" name="上报消息" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_12b40yg</bpmn:incoming>
+      <bpmn:outgoing>Flow_1tp2sgi</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_12b40yg" sourceRef="start" targetRef="pushMessage" />
+    <bpmn:endEvent id="Event_1sja6nt">
+      <bpmn:incoming>Flow_1tp2sgi</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1tp2sgi" sourceRef="pushMessage" targetRef="Event_1sja6nt" />
+  </bpmn:process>
+  <bpmn:message id="Message_Start" name="消息数据上报" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="message_start_demo">
+      <bpmndi:BPMNShape id="Event_0524qx0_di" bpmnElement="start">
+        <dc:Bounds x="-188" y="-548" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-191" y="-505" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_10hodeg_di" bpmnElement="pushMessage">
+        <dc:Bounds x="-100" y="-570" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1sja6nt_di" bpmnElement="Event_1sja6nt">
+        <dc:Bounds x="52" y="-548" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_12b40yg_di" bpmnElement="Flow_12b40yg">
+        <di:waypoint x="-152" y="-530" />
+        <di:waypoint x="-100" y="-530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tp2sgi_di" bpmnElement="Flow_1tp2sgi">
+        <di:waypoint x="0" y="-530" />
+        <di:waypoint x="52" y="-530" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
