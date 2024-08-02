@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="schedule-start" name="schedule-start" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_1f5g6t4" sourceRef="sart" targetRef="print" />
+    <bpmn:endEvent id="end" name="流程结束">
+      <bpmn:incoming>Flow_1k0ky8g</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1k0ky8g" sourceRef="print" targetRef="end" />
+    <bpmn:startEvent id="sart" name="流程定时启动">
+      <bpmn:outgoing>Flow_1f5g6t4</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1hi80a3">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 * * * * ?</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="print" name="打印内容" flowable:expression="${scheduleDemo.print(execution)}">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1f5g6t4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1k0ky8g</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="schedule-start">
+      <bpmndi:BPMNShape id="Event_06gq0b9_di" bpmnElement="end">
+        <dc:Bounds x="22" y="-178" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="18" y="-135" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0alilnr_di" bpmnElement="sart">
+        <dc:Bounds x="-218" y="-178" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-232" y="-135" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02k2v1q_di" bpmnElement="print">
+        <dc:Bounds x="-130" y="-200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1f5g6t4_di" bpmnElement="Flow_1f5g6t4">
+        <di:waypoint x="-182" y="-160" />
+        <di:waypoint x="-130" y="-160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1k0ky8g_di" bpmnElement="Flow_1k0ky8g">
+        <di:waypoint x="-30" y="-160" />
+        <di:waypoint x="22" y="-160" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

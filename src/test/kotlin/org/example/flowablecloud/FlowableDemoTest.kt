@@ -34,6 +34,5 @@ class FlowableDemoTest {
         val t2 = taskService.createTaskQuery().active().singleResult()
         assertEquals("audit", t2.taskDefinitionKey)
         taskService.complete(t2.id)
-
     }
 }
