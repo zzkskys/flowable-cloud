@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="health_code" name="健康码错误边界事件" isExecutable="true">
+    <bpmn:startEvent id="Event_0xdm0jy" flowable:initiator="initiator">
+      <bpmn:outgoing>Flow_18n468o</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="commit" name="提交材料" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_18n468o</bpmn:incoming>
+      <bpmn:outgoing>Flow_0btx6pa</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_18n468o" sourceRef="Event_0xdm0jy" targetRef="commit" />
+    <bpmn:sequenceFlow id="Flow_0btx6pa" sourceRef="commit" targetRef="auto_audit" />
+    <bpmn:serviceTask id="auto_audit" name="自动审核" flowable:expression="${healthCode.autoAudit(execution)}">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_0btx6pa</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rgjlua</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="result_commit" name="结果登记" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1rgjlua</bpmn:incoming>
+      <bpmn:incoming>Flow_0he7yip</bpmn:incoming>
+      <bpmn:outgoing>Flow_0l6akwu</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1rgjlua" sourceRef="auto_audit" targetRef="result_commit" />
+    <bpmn:endEvent id="Event_18jhyej">
+      <bpmn:incoming>Flow_0l6akwu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0l6akwu" sourceRef="result_commit" targetRef="Event_18jhyej" />
+    <bpmn:userTask id="person_audit" name="人工复核" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_07xg65d</bpmn:incoming>
+      <bpmn:outgoing>Flow_0he7yip</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Event_0m05e5t" flowable:cancelActivity="true" attachedToRef="auto_audit">
+      <bpmn:outgoing>Flow_07xg65d</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_103ih1t" errorRef="healthy_code_error"/>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_07xg65d" sourceRef="Event_0m05e5t" targetRef="person_audit" />
+    <bpmn:sequenceFlow id="Flow_0he7yip" sourceRef="person_audit" targetRef="result_commit" />
+  </bpmn:process>
+  <bpmn:error id="healthy_code_error" name="healthyCode" errorCode="10001" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="health_code">
+      <bpmndi:BPMNShape id="Event_0xdm0jy_di" bpmnElement="Event_0xdm0jy">
+        <dc:Bounds x="712" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o43aol_di" bpmnElement="commit">
+        <dc:Bounds x="800" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_18jhyej_di" bpmnElement="Event_18jhyej">
+        <dc:Bounds x="1342" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1rhnnbu_di" bpmnElement="result_commit">
+        <dc:Bounds x="1170" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05epkcr_di" bpmnElement="auto_audit">
+        <dc:Bounds x="980" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0liyq4o_di" bpmnElement="person_audit">
+        <dc:Bounds x="1170" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17z1u1f_di" bpmnElement="Event_0m05e5t">
+        <dc:Bounds x="1012" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_18n468o_di" bpmnElement="Flow_18n468o">
+        <di:waypoint x="748" y="150" />
+        <di:waypoint x="800" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0btx6pa_di" bpmnElement="Flow_0btx6pa">
+        <di:waypoint x="900" y="150" />
+        <di:waypoint x="980" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rgjlua_di" bpmnElement="Flow_1rgjlua">
+        <di:waypoint x="1080" y="150" />
+        <di:waypoint x="1170" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l6akwu_di" bpmnElement="Flow_0l6akwu">
+        <di:waypoint x="1270" y="150" />
+        <di:waypoint x="1342" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07xg65d_di" bpmnElement="Flow_07xg65d">
+        <di:waypoint x="1030" y="208" />
+        <di:waypoint x="1030" y="320" />
+        <di:waypoint x="1170" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0he7yip_di" bpmnElement="Flow_0he7yip">
+        <di:waypoint x="1220" y="280" />
+        <di:waypoint x="1220" y="190" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
