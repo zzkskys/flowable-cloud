@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="reimbursement" name="报销流程" isExecutable="true">
+    <bpmn:startEvent id="start" name="报销流程开始" flowable:initiator="initiator">
+      <bpmn:outgoing>Flow_01eod3o</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="reimbursement_apply" name="报销申请" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_01eod3o</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d8yxz9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_01eod3o" sourceRef="start" targetRef="reimbursement_apply" />
+    <bpmn:exclusiveGateway id="reimbursement_gateway" name="预算审核">
+      <bpmn:incoming>Flow_0d8yxz9</bpmn:incoming>
+      <bpmn:outgoing>reimbursement_pass</bpmn:outgoing>
+      <bpmn:outgoing>reimbursement_unpass</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0d8yxz9" sourceRef="reimbursement_apply" targetRef="reimbursement_gateway" />
+    <bpmn:endEvent id="end" name="报销结束">
+      <bpmn:incoming>reimbursement_pass</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="reimbursement_pass" name="预算充足" sourceRef="reimbursement_gateway" targetRef="end">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${pass}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="reimbursement_unpass" name="预算不足" sourceRef="reimbursement_gateway" targetRef="reimbursement_erro_end">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!pass}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="reimbursement_erro_end" name="报销错误">
+      <bpmn:incoming>reimbursement_unpass</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_00q5hmr" errorRef="reimbursement_error" />
+    </bpmn:endEvent>
+    <bpmn:subProcess id="reimbursement_sub_process" name="制定部门预算子流程" triggeredByEvent="true">
+      <bpmn:startEvent id="reimbursement_start" name="部门预算重新制定开始" flowable:isInterrupting="true">
+        <bpmn:outgoing>Flow_06qt92c</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_1cxhv1m" errorRef="reimbursement_error" />
+      </bpmn:startEvent>
+      <bpmn:userTask id="reimbursement_replay" name="重新制定报销预算" flowable:assignee="b">
+        <bpmn:extensionElements>
+          <flowable:assigneeType>static</flowable:assigneeType>
+          <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_06qt92c</bpmn:incoming>
+        <bpmn:outgoing>Flow_055a3wn</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_06qt92c" sourceRef="reimbursement_start" targetRef="reimbursement_replay" />
+      <bpmn:intermediateThrowEvent id="Event_09s57rr" name="制定结束">
+        <bpmn:incoming>Flow_055a3wn</bpmn:incoming>
+      </bpmn:intermediateThrowEvent>
+      <bpmn:sequenceFlow id="Flow_055a3wn" sourceRef="reimbursement_replay" targetRef="Event_09s57rr" />
+    </bpmn:subProcess>
+  </bpmn:process>
+  <bpmn:error id="reimbursement_error" name="报销错误" errorCode="10000" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="reimbursement">
+      <bpmndi:BPMNShape id="Event_0bfkdnd_di" bpmnElement="start">
+        <dc:Bounds x="-168" y="-98" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-183" y="-55" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0clmt51_di" bpmnElement="reimbursement_apply">
+        <dc:Bounds x="-80" y="-120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_15p7ypj_di" bpmnElement="reimbursement_gateway" isMarkerVisible="true">
+        <dc:Bounds x="75" y="-105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="78" y="-129" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1qop2zt_di" bpmnElement="end">
+        <dc:Bounds x="262" y="-98" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="262" y="-55" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_11zqsel_di" bpmnElement="reimbursement_erro_end">
+        <dc:Bounds x="262" y="12" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="259" y="55" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_06u1lu9_di" bpmnElement="reimbursement_sub_process" isExpanded="true">
+        <dc:Bounds x="-90" y="130" width="450" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1x0cgg8_di" bpmnElement="reimbursement_start">
+        <dc:Bounds x="-58" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-77" y="245" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09s57rr_di" bpmnElement="Event_09s57rr">
+        <dc:Bounds x="262" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="258" y="245" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14i67vp_di" bpmnElement="reimbursement_replay">
+        <dc:Bounds x="70" y="180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_06qt92c_di" bpmnElement="Flow_06qt92c">
+        <di:waypoint x="-22" y="220" />
+        <di:waypoint x="70" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_055a3wn_di" bpmnElement="Flow_055a3wn">
+        <di:waypoint x="170" y="220" />
+        <di:waypoint x="262" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01eod3o_di" bpmnElement="Flow_01eod3o">
+        <di:waypoint x="-132" y="-80" />
+        <di:waypoint x="-80" y="-80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d8yxz9_di" bpmnElement="Flow_0d8yxz9">
+        <di:waypoint x="20" y="-80" />
+        <di:waypoint x="75" y="-80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e840ct_di" bpmnElement="reimbursement_pass">
+        <di:waypoint x="125" y="-80" />
+        <di:waypoint x="262" y="-80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="172" y="-98" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jf9ifn_di" bpmnElement="reimbursement_unpass">
+        <di:waypoint x="100" y="-55" />
+        <di:waypoint x="100" y="30" />
+        <di:waypoint x="262" y="30" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="93" y="-15" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
