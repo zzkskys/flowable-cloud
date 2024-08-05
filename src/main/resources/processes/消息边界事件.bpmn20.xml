@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="message_boundary_demo" name="消息边界事件" isExecutable="true">
+    <bpmn:startEvent id="start" flowable:initiator="initiator">
+      <bpmn:outgoing>Flow_02c03gd</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="message_boundary_touch" name="触发消息边界事件" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_02c03gd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1c6zsh7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_02c03gd" sourceRef="start" targetRef="message_boundary_touch" />
+    <bpmn:boundaryEvent id="message_touch_event" flowable:cancelActivity="true" attachedToRef="message_boundary_touch">
+      <bpmn:outgoing>Flow_0bhv3tv</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0nq1cdu" messageRef="message_boundary" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="audit" name="审批" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1c6zsh7</bpmn:incoming>
+      <bpmn:outgoing>end</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1c6zsh7" sourceRef="message_boundary_touch" targetRef="audit" />
+    <bpmn:endEvent id="Event_1uai1gh">
+      <bpmn:incoming>end</bpmn:incoming>
+      <bpmn:incoming>Flow_0mhv7un</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="end" sourceRef="audit" targetRef="Event_1uai1gh" />
+    <bpmn:userTask id="apply" name="申请" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0bhv3tv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0mhv7un</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0bhv3tv" sourceRef="message_touch_event" targetRef="apply" />
+    <bpmn:sequenceFlow id="Flow_0mhv7un" sourceRef="apply" targetRef="Event_1uai1gh" />
+  </bpmn:process>
+  <bpmn:message id="message_boundary" name="触发消息边界事件" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="message_boundary_demo">
+      <bpmndi:BPMNShape id="Event_0i1dyhi_di" bpmnElement="start">
+        <dc:Bounds x="622" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03kmdcj_di" bpmnElement="message_boundary_touch">
+        <dc:Bounds x="710" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1uai1gh_di" bpmnElement="Event_1uai1gh">
+        <dc:Bounds x="1082" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1kxhq86_di" bpmnElement="audit">
+        <dc:Bounds x="900" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0v0qfax_di" bpmnElement="apply">
+        <dc:Bounds x="900" y="290" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ryq5cl_di" bpmnElement="message_touch_event">
+        <dc:Bounds x="742" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_02c03gd_di" bpmnElement="Flow_02c03gd">
+        <di:waypoint x="658" y="150" />
+        <di:waypoint x="710" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c6zsh7_di" bpmnElement="Flow_1c6zsh7">
+        <di:waypoint x="810" y="150" />
+        <di:waypoint x="900" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gglvh1_di" bpmnElement="end">
+        <di:waypoint x="1000" y="150" />
+        <di:waypoint x="1082" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bhv3tv_di" bpmnElement="Flow_0bhv3tv">
+        <di:waypoint x="760" y="208" />
+        <di:waypoint x="760" y="330" />
+        <di:waypoint x="900" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mhv7un_di" bpmnElement="Flow_0mhv7un">
+        <di:waypoint x="1000" y="330" />
+        <di:waypoint x="1100" y="330" />
+        <di:waypoint x="1100" y="168" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

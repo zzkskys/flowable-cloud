@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="update_contract_process" name="信号开始事件合同流程" isExecutable="true">
+    <bpmn:startEvent id="Event_11swx27" flowable:initiator="initiator">
+      <bpmn:outgoing>Flow_124bdnl</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="apply" name="发起合同" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_124bdnl</bpmn:incoming>
+      <bpmn:incoming>Flow_1m8qmpr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sj5a5x</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_124bdnl" sourceRef="Event_11swx27" targetRef="apply" />
+    <bpmn:userTask id="audit" name="确认合同" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0sj5a5x</bpmn:incoming>
+      <bpmn:outgoing>Flow_1u1ev2y</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0sj5a5x" sourceRef="apply" targetRef="audit" />
+    <bpmn:userTask id="sign" name="签署合同" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1u1ev2y</bpmn:incoming>
+      <bpmn:outgoing>Flow_0h8rnxx</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1u1ev2y" sourceRef="audit" targetRef="sign" />
+    <bpmn:endEvent id="Event_0e14hpu">
+      <bpmn:incoming>Flow_0h8rnxx</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0h8rnxx" sourceRef="sign" targetRef="Event_0e14hpu" />
+    <bpmn:boundaryEvent id="Event_1iv9r4c" flowable:cancelActivity="true" attachedToRef="audit">
+      <bpmn:outgoing>Flow_0e447ru</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_11fll57" signalRef="update_contract_signal" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="update_contract" name="修改合同" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0e447ru</bpmn:incoming>
+      <bpmn:outgoing>Flow_1m8qmpr</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0e447ru" sourceRef="Event_1iv9r4c" targetRef="update_contract" />
+    <bpmn:sequenceFlow id="Flow_1m8qmpr" sourceRef="update_contract" targetRef="apply" />
+  </bpmn:process>
+  <bpmn:signal id="update_contract_signal" name="修改合同信号" flowable:scope="global" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="update_contract_process">
+      <bpmndi:BPMNShape id="Event_11swx27_di" bpmnElement="Event_11swx27">
+        <dc:Bounds x="422" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wcqv1q_di" bpmnElement="apply">
+        <dc:Bounds x="510" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0e14hpu_di" bpmnElement="Event_0e14hpu">
+        <dc:Bounds x="1052" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0sbzqes_di" bpmnElement="sign">
+        <dc:Bounds x="870" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nl0w0c_di" bpmnElement="audit">
+        <dc:Bounds x="690" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0uyx8fa_di" bpmnElement="update_contract">
+        <dc:Bounds x="690" y="290" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03aa4fw_di" bpmnElement="Event_1iv9r4c">
+        <dc:Bounds x="722" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_124bdnl_di" bpmnElement="Flow_124bdnl">
+        <di:waypoint x="458" y="150" />
+        <di:waypoint x="510" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sj5a5x_di" bpmnElement="Flow_0sj5a5x">
+        <di:waypoint x="610" y="150" />
+        <di:waypoint x="690" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u1ev2y_di" bpmnElement="Flow_1u1ev2y">
+        <di:waypoint x="790" y="150" />
+        <di:waypoint x="870" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0h8rnxx_di" bpmnElement="Flow_0h8rnxx">
+        <di:waypoint x="970" y="150" />
+        <di:waypoint x="1052" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e447ru_di" bpmnElement="Flow_0e447ru">
+        <di:waypoint x="740" y="208" />
+        <di:waypoint x="740" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1m8qmpr_di" bpmnElement="Flow_1m8qmpr">
+        <di:waypoint x="690" y="330" />
+        <di:waypoint x="560" y="330" />
+        <di:waypoint x="560" y="190" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
