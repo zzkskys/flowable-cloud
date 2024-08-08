@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
+import kotlin.test.assertNull
 
 /**
  * 边界补偿事件测试
@@ -60,5 +61,13 @@ class CompensationBoundaryTest {
             .singleResult()
 
         taskService.complete(金额支付.id)
+
+
+        val pp1 = runtimeService
+            .createProcessInstanceQuery()
+            .processInstanceId(p1.processInstanceId)
+            .singleResult()
+
+        assertNull(pp1, "流程未完结")
     }
 }
