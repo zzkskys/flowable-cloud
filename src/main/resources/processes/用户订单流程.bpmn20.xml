@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="user_order" name="用户订单流程" isExecutable="true">
+    <bpmn:startEvent id="Event_0cc4i55" flowable:initiator="initiator">
+      <bpmn:outgoing>Flow_1px1x5z</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="apply" name="用户提交订单" flowable:assignee="aa" >
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1px1x5z</bpmn:incoming>
+      <bpmn:outgoing>Flow_11mu4vn</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1px1x5z" sourceRef="Event_0cc4i55" targetRef="apply" />
+    <bpmn:transaction id="inventory_sub_process" name="事务子流程">
+      <bpmn:incoming>Flow_11mu4vn</bpmn:incoming>
+      <bpmn:outgoing>Flow_10vr8rr</bpmn:outgoing>
+      <bpmn:startEvent id="Event_0pdqgk8" flowable:initiator="initiator">
+        <bpmn:outgoing>Flow_1h4aj1o</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_1h4aj1o" sourceRef="Event_0pdqgk8" targetRef="Gateway_193g322" />
+      <bpmn:parallelGateway id="Gateway_193g322">
+        <bpmn:incoming>Flow_1h4aj1o</bpmn:incoming>
+        <bpmn:outgoing>Flow_15utx2e</bpmn:outgoing>
+        <bpmn:outgoing>Flow_1067omd</bpmn:outgoing>
+      </bpmn:parallelGateway>
+      <bpmn:userTask id="cancel_order" name="用户取消订单" flowable:assignee="a">
+        <bpmn:extensionElements>
+          <flowable:assigneeType>static</flowable:assigneeType>
+          <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_15utx2e</bpmn:incoming>
+        <bpmn:outgoing>Flow_18548sl</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_15utx2e" sourceRef="Gateway_193g322" targetRef="cancel_order" />
+      <bpmn:sequenceFlow id="Flow_1067omd" sourceRef="Gateway_193g322" targetRef="lock_inventory" />
+      <bpmn:serviceTask id="lock_inventory" name="锁定库存" flowable:delegateExpression="${lockInventoryService}">
+        <bpmn:extensionElements />
+        <bpmn:incoming>Flow_1067omd</bpmn:incoming>
+        <bpmn:outgoing>Flow_15o8r2c</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:userTask id="pay" name="用户支付订单" flowable:assignee="a">
+        <bpmn:extensionElements>
+          <flowable:assigneeType>static</flowable:assigneeType>
+          <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_15o8r2c</bpmn:incoming>
+        <bpmn:outgoing>Flow_1d2lbhv</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_15o8r2c" sourceRef="lock_inventory" targetRef="pay" />
+      <bpmn:sequenceFlow id="Flow_1d2lbhv" sourceRef="pay" targetRef="deduct_inventory" />
+      <bpmn:serviceTask id="deduct_inventory" name="扣减库存" flowable:delegateExpression="${deductInventoryService}">
+        <bpmn:extensionElements />
+        <bpmn:incoming>Flow_1d2lbhv</bpmn:incoming>
+        <bpmn:outgoing>Flow_04z8co6</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="inventory_end">
+        <bpmn:incoming>Flow_04z8co6</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_04z8co6" sourceRef="deduct_inventory" targetRef="inventory_end" />
+      <bpmn:sequenceFlow id="Flow_18548sl" sourceRef="cancel_order" targetRef="cancel_end" />
+      <bpmn:endEvent id="cancel_end" name="事务进行失败">
+        <bpmn:incoming>Flow_18548sl</bpmn:incoming>
+        <bpmn:incoming>Flow_1imwulu</bpmn:incoming>
+        <bpmn:incoming>Flow_19ifotb</bpmn:incoming>
+        <bpmn:cancelEventDefinition id="CancelEventDefinition_1wp4kml" />
+      </bpmn:endEvent>
+      <bpmn:boundaryEvent id="deduct_invetory_error_event" name="扣减库存错误" flowable:cancelActivity="true" attachedToRef="deduct_inventory">
+        <bpmn:outgoing>Flow_1imwulu</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_1481qgw" errorRef="deduct_inventory_error" />
+      </bpmn:boundaryEvent>
+      <bpmn:sequenceFlow id="Flow_1imwulu" sourceRef="deduct_invetory_error_event" targetRef="cancel_end" />
+      <bpmn:boundaryEvent id="auto_cancel" name="30分钟未支付自动取消" flowable:cancelActivity="true" attachedToRef="pay">
+        <bpmn:outgoing>Flow_19ifotb</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_1tezucj">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30M</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:sequenceFlow id="Flow_19ifotb" sourceRef="auto_cancel" targetRef="cancel_end" />
+      <bpmn:serviceTask id="release_inventory" name="释放库存" isForCompensation="true" flowable:delegateExpression="${releaseInventoryService}">
+        <bpmn:extensionElements />
+      </bpmn:serviceTask>
+      <bpmn:boundaryEvent id="Event_1j7x8jx" flowable:cancelActivity="true" attachedToRef="lock_inventory">
+        <bpmn:compensateEventDefinition id="CompensateEventDefinition_0o9d59u" />
+      </bpmn:boundaryEvent>
+      <bpmn:serviceTask id="cost_return" name="费用退回" isForCompensation="true" flowable:expression="${costReturnService}">
+        <bpmn:extensionElements />
+      </bpmn:serviceTask>
+      <bpmn:boundaryEvent id="Event_17iaf67" flowable:cancelActivity="true" attachedToRef="pay">
+        <bpmn:compensateEventDefinition id="CompensateEventDefinition_0g4nqch" />
+      </bpmn:boundaryEvent>
+      <bpmn:association id="Association_153xw52" associationDirection="One" sourceRef="Event_1j7x8jx" targetRef="release_inventory" />
+      <bpmn:association id="Association_16ujyx9" associationDirection="One" sourceRef="Event_17iaf67" targetRef="cost_return" />
+    </bpmn:transaction>
+    <bpmn:sequenceFlow id="Flow_11mu4vn" sourceRef="apply" targetRef="inventory_sub_process" />
+    <bpmn:endEvent id="all_end">
+      <bpmn:incoming>Flow_10vr8rr</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_10vr8rr" sourceRef="inventory_sub_process" targetRef="all_end" />
+    <bpmn:boundaryEvent id="Event_1asdr4q" flowable:cancelActivity="true" attachedToRef="inventory_sub_process">
+      <bpmn:outgoing>Flow_0fgwwov</bpmn:outgoing>
+      <bpmn:cancelEventDefinition id="CancelEventDefinition_1b22jda" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0fgwwov" sourceRef="Event_1asdr4q" targetRef="auto_cance_order" />
+    <bpmn:serviceTask id="auto_cance_order" name="自动取消订单" flowable:delegateExpression="${autoCancelOrderService}">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_0fgwwov</bpmn:incoming>
+      <bpmn:outgoing>Flow_07tuqjg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="cancel_order_end" name="取消订单结束">
+      <bpmn:incoming>Flow_07tuqjg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_07tuqjg" sourceRef="auto_cance_order" targetRef="cancel_order_end" />
+  </bpmn:process>
+  <bpmn:error id="deduct_inventory_error" name="扣减库存错误" errorCode="20000" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="user_order">
+      <bpmndi:BPMNShape id="Event_0cc4i55_di" bpmnElement="Event_0cc4i55">
+        <dc:Bounds x="2" y="-88" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0r5hl1i_di" bpmnElement="apply">
+        <dc:Bounds x="90" y="-110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1vpwnyq_di" bpmnElement="all_end">
+        <dc:Bounds x="1352" y="-88" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gyxuch_di" bpmnElement="auto_cance_order">
+        <dc:Bounds x="800" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09c40c9_di" bpmnElement="cancel_order_end">
+        <dc:Bounds x="992" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="978" y="295" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k9jcse_di" bpmnElement="inventory_sub_process" isExpanded="true">
+        <dc:Bounds x="280" y="-395" width="930" height="580" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pdqgk8_di" bpmnElement="Event_0pdqgk8">
+        <dc:Bounds x="322" y="-73" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0yzrlkl_di" bpmnElement="Gateway_193g322">
+        <dc:Bounds x="415" y="-80" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o8v2wt_di" bpmnElement="cancel_order">
+        <dc:Bounds x="550" y="45" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vlqt71_di" bpmnElement="lock_inventory">
+        <dc:Bounds x="550" y="-215" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1iuumud_di" bpmnElement="pay">
+        <dc:Bounds x="740" y="-215" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1cx4c09_di" bpmnElement="deduct_inventory">
+        <dc:Bounds x="930" y="-215" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0o2q9bb_di" bpmnElement="inventory_end">
+        <dc:Bounds x="1122" y="-193" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1136" y="-165" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0yhj21s_di" bpmnElement="cancel_end">
+        <dc:Bounds x="852" y="67" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="837" y="110" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_018cu4m_di" bpmnElement="release_inventory">
+        <dc:Bounds x="550" y="-360" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gciniu_di" bpmnElement="cost_return">
+        <dc:Bounds x="740" y="-360" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_153xw52_di" bpmnElement="Association_153xw52">
+        <di:waypoint x="600" y="-233" />
+        <di:waypoint x="600" y="-280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_16ujyx9_di" bpmnElement="Association_16ujyx9">
+        <di:waypoint x="790" y="-233" />
+        <di:waypoint x="790" y="-280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0p49vj5_di" bpmnElement="deduct_invetory_error_event">
+        <dc:Bounds x="962" y="-153" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="949" y="-110" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0tudp9u_di" bpmnElement="auto_cancel">
+        <dc:Bounds x="772" y="-153" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="-110" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_01aakf2_di" bpmnElement="Event_1j7x8jx">
+        <dc:Bounds x="582" y="-233" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0b9n9px_di" bpmnElement="Event_17iaf67">
+        <dc:Bounds x="772" y="-233" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1h4aj1o_di" bpmnElement="Flow_1h4aj1o">
+        <di:waypoint x="358" y="-55" />
+        <di:waypoint x="415" y="-55" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15utx2e_di" bpmnElement="Flow_15utx2e">
+        <di:waypoint x="440" y="-30" />
+        <di:waypoint x="440" y="85" />
+        <di:waypoint x="550" y="85" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1067omd_di" bpmnElement="Flow_1067omd">
+        <di:waypoint x="440" y="-80" />
+        <di:waypoint x="440" y="-175" />
+        <di:waypoint x="550" y="-175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18548sl_di" bpmnElement="Flow_18548sl">
+        <di:waypoint x="650" y="85" />
+        <di:waypoint x="852" y="85" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15o8r2c_di" bpmnElement="Flow_15o8r2c">
+        <di:waypoint x="650" y="-175" />
+        <di:waypoint x="740" y="-175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d2lbhv_di" bpmnElement="Flow_1d2lbhv">
+        <di:waypoint x="840" y="-175" />
+        <di:waypoint x="930" y="-175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04z8co6_di" bpmnElement="Flow_04z8co6">
+        <di:waypoint x="1030" y="-175" />
+        <di:waypoint x="1122" y="-175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1imwulu_di" bpmnElement="Flow_1imwulu">
+        <di:waypoint x="980" y="-117" />
+        <di:waypoint x="980" y="85" />
+        <di:waypoint x="888" y="85" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19ifotb_di" bpmnElement="Flow_19ifotb">
+        <di:waypoint x="796" y="-118" />
+        <di:waypoint x="864" y="68" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1sz8x7m_di" bpmnElement="Event_1asdr4q">
+        <dc:Bounds x="712" y="167" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1px1x5z_di" bpmnElement="Flow_1px1x5z">
+        <di:waypoint x="38" y="-70" />
+        <di:waypoint x="90" y="-70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11mu4vn_di" bpmnElement="Flow_11mu4vn">
+        <di:waypoint x="190" y="-70" />
+        <di:waypoint x="280" y="-70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10vr8rr_di" bpmnElement="Flow_10vr8rr">
+        <di:waypoint x="1210" y="-70" />
+        <di:waypoint x="1352" y="-70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fgwwov_di" bpmnElement="Flow_0fgwwov">
+        <di:waypoint x="730" y="203" />
+        <di:waypoint x="730" y="270" />
+        <di:waypoint x="800" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07tuqjg_di" bpmnElement="Flow_07tuqjg">
+        <di:waypoint x="900" y="270" />
+        <di:waypoint x="992" y="270" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
