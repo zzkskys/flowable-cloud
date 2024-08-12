@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest
 @ExtendWith(FlowableSpringExtension::class)
 @SpringBootTest
 @AutoConfigureTestDatabase
-class IntermediateCacheTest {
+class IntermediateCatchTest {
 
     @Autowired
     lateinit var runtimeService: RuntimeService
