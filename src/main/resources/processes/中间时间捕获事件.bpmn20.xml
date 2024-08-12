@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="intermediate_cache" name="中间时间捕获事件" isExecutable="true">
+    <bpmn:startEvent id="Event_06nmbdl" flowable:initiator="initiator">
+      <bpmn:outgoing>Flow_1pjlbpz</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="apply" name="出库申请" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1pjlbpz</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dof3qx</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1pjlbpz" sourceRef="Event_06nmbdl" targetRef="apply" />
+    <bpmn:sequenceFlow id="Flow_0dof3qx" sourceRef="apply" targetRef="outbound_timer_cache" />
+    <bpmn:intermediateCatchEvent id="outbound_timer_cache" name="1分钟后触发">
+      <bpmn:incoming>Flow_0dof3qx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b6m87s</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0nl51v5">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="outbound" name="物资出库" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0b6m87s</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wr4wrf</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0b6m87s" sourceRef="outbound_timer_cache" targetRef="outbound" />
+    <bpmn:endEvent id="Event_17x8g1g">
+      <bpmn:incoming>Flow_1wr4wrf</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1wr4wrf" sourceRef="outbound" targetRef="Event_17x8g1g" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="intermediate_cache">
+      <bpmndi:BPMNShape id="Event_06nmbdl_di" bpmnElement="Event_06nmbdl">
+        <dc:Bounds x="422" y="-78" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ctthit_di" bpmnElement="apply">
+        <dc:Bounds x="510" y="-100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1jjqmp6_di" bpmnElement="outbound_timer_cache">
+        <dc:Bounds x="662" y="-78" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="655" y="-35" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0b3yzne_di" bpmnElement="outbound">
+        <dc:Bounds x="750" y="-100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17x8g1g_di" bpmnElement="Event_17x8g1g">
+        <dc:Bounds x="902" y="-78" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1pjlbpz_di" bpmnElement="Flow_1pjlbpz">
+        <di:waypoint x="458" y="-60" />
+        <di:waypoint x="510" y="-60" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dof3qx_di" bpmnElement="Flow_0dof3qx">
+        <di:waypoint x="610" y="-60" />
+        <di:waypoint x="662" y="-60" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b6m87s_di" bpmnElement="Flow_0b6m87s">
+        <di:waypoint x="698" y="-60" />
+        <di:waypoint x="750" y="-60" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wr4wrf_di" bpmnElement="Flow_1wr4wrf">
+        <di:waypoint x="850" y="-60" />
+        <di:waypoint x="902" y="-60" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
