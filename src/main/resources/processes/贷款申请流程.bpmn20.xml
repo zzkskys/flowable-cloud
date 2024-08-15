@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" id="Definitions_abckey123456" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="loan_process" name="贷款申请流程" isExecutable="true">
+    <bpmn:startEvent id="start" flowable:initiator="initiator">
+      <bpmn:outgoing>Flow_1eqf2g9</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="apply" name="贷款申请" flowable:assignee="a">
+      <bpmn:extensionElements>
+        <flowable:assigneeType>static</flowable:assigneeType>
+        <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1eqf2g9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rnl0r2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1eqf2g9" sourceRef="start" targetRef="apply" />
+    <bpmn:subProcess id="loan_sub_process" name="贷款额度审批">
+      <bpmn:incoming>Flow_1rnl0r2</bpmn:incoming>
+      <bpmn:outgoing>Flow_198wv23</bpmn:outgoing>
+      <bpmn:startEvent id="sub_start" flowable:initiator="initiator">
+        <bpmn:outgoing>Flow_0h6h1r7</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="audit" name="审批贷款额度" flowable:assignee="a">
+        <bpmn:extensionElements>
+          <flowable:assigneeType>static</flowable:assigneeType>
+          <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0h6h1r7</bpmn:incoming>
+        <bpmn:outgoing>Flow_0a4a598</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_0h6h1r7" sourceRef="sub_start" targetRef="audit" />
+      <bpmn:exclusiveGateway id="Gateway_1vf864z">
+        <bpmn:incoming>Flow_0a4a598</bpmn:incoming>
+        <bpmn:outgoing>Flow_0qm7r84</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0nk19zd</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_0a4a598" sourceRef="audit" targetRef="Gateway_1vf864z" />
+      <bpmn:userTask id="audit_again" name="复核贷款额度" flowable:assignee="a">
+        <bpmn:extensionElements>
+          <flowable:assigneeType>static</flowable:assigneeType>
+          <flowable:staticAssigneeVariables>[]</flowable:staticAssigneeVariables>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0qm7r84</bpmn:incoming>
+        <bpmn:outgoing>Flow_132ulcs</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_0qm7r84" name="贷款额度大于等于100万" sourceRef="Gateway_1vf864z" targetRef="audit_again">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${loan_limit&gt;=1000000}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:endEvent id="Event_0yoy4t8">
+        <bpmn:incoming>Flow_132ulcs</bpmn:incoming>
+        <bpmn:incoming>Flow_0nk19zd</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_132ulcs" sourceRef="audit_again" targetRef="Event_0yoy4t8" />
+      <bpmn:sequenceFlow id="Flow_0nk19zd" name="贷款额度小于100万" sourceRef="Gateway_1vf864z" targetRef="Event_0yoy4t8">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${loan_limit&lt;1000000}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_1rnl0r2" sourceRef="apply" targetRef="loan_sub_process" />
+    <bpmn:endEvent id="end">
+      <bpmn:incoming>Flow_198wv23</bpmn:incoming>
+      <bpmn:incoming>Flow_0ho36kv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_198wv23" sourceRef="loan_sub_process" targetRef="end" />
+    <bpmn:boundaryEvent id="Event_10kmjtl" name="30 分钟" flowable:cancelActivity="true" attachedToRef="loan_sub_process">
+      <bpmn:outgoing>Flow_0ho36kv</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0dylytu">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0ho36kv" sourceRef="Event_10kmjtl" targetRef="end" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="loan_process">
+      <bpmndi:BPMNShape id="Event_04d8ixx_di" bpmnElement="start">
+        <dc:Bounds x="32" y="-58" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_16rwcv4_di" bpmnElement="apply">
+        <dc:Bounds x="120" y="-80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0wa6wfe_di" bpmnElement="end">
+        <dc:Bounds x="1152" y="-58" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0g12okf_di" bpmnElement="loan_sub_process" isExpanded="true">
+        <dc:Bounds x="290" y="-180" width="700" height="320" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0tioh6n_di" bpmnElement="sub_start">
+        <dc:Bounds x="342" y="-58" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1e34u6s_di" bpmnElement="audit">
+        <dc:Bounds x="430" y="-80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1vf864z_di" bpmnElement="Gateway_1vf864z" isMarkerVisible="true">
+        <dc:Bounds x="585" y="-65" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0yoy4t8_di" bpmnElement="Event_0yoy4t8">
+        <dc:Bounds x="902" y="-58" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03kj9d5_di" bpmnElement="audit_again">
+        <dc:Bounds x="690" y="20" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0h6h1r7_di" bpmnElement="Flow_0h6h1r7">
+        <di:waypoint x="378" y="-40" />
+        <di:waypoint x="430" y="-40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a4a598_di" bpmnElement="Flow_0a4a598">
+        <di:waypoint x="530" y="-40" />
+        <di:waypoint x="585" y="-40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qm7r84_di" bpmnElement="Flow_0qm7r84">
+        <di:waypoint x="610" y="-15" />
+        <di:waypoint x="610" y="60" />
+        <di:waypoint x="690" y="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="581" y="24" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_132ulcs_di" bpmnElement="Flow_132ulcs">
+        <di:waypoint x="790" y="60" />
+        <di:waypoint x="920" y="60" />
+        <di:waypoint x="920" y="-22" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nk19zd_di" bpmnElement="Flow_0nk19zd">
+        <di:waypoint x="610" y="-65" />
+        <di:waypoint x="610" y="-120" />
+        <di:waypoint x="920" y="-120" />
+        <di:waypoint x="920" y="-58" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="723" y="-154" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0vhwuir_di" bpmnElement="Event_10kmjtl">
+        <dc:Bounds x="712" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="714" y="165" width="38" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1eqf2g9_di" bpmnElement="Flow_1eqf2g9">
+        <di:waypoint x="68" y="-40" />
+        <di:waypoint x="120" y="-40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rnl0r2_di" bpmnElement="Flow_1rnl0r2">
+        <di:waypoint x="220" y="-40" />
+        <di:waypoint x="290" y="-40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_198wv23_di" bpmnElement="Flow_198wv23">
+        <di:waypoint x="990" y="-40" />
+        <di:waypoint x="1152" y="-40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ho36kv_di" bpmnElement="Flow_0ho36kv">
+        <di:waypoint x="730" y="158" />
+        <di:waypoint x="730" y="240" />
+        <di:waypoint x="1170" y="240" />
+        <di:waypoint x="1170" y="-22" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="912" y="222" width="76" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
